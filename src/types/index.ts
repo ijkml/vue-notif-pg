@@ -10,6 +10,8 @@ export interface IconProps extends IconSVG {
 export type NotificationType = 'info' | 'success' | 'error' | 'warning';
 // type NotificationPosition = 'left' | 'center' | 'right';
 
+export type NotificationId = string;
+
 export interface VnNotificationOptions {
   type: NotificationType;
   title: string;
@@ -17,4 +19,8 @@ export interface VnNotificationOptions {
   timeout?: number;
   dark?: boolean;
   callback?(): void;
+}
+
+export interface VnNotificationOptionsWithID extends VnNotificationOptions {
+  id: NotificationId;
 }

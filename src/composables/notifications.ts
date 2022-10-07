@@ -1,71 +1,6 @@
-import { ref } from 'vue';
-import type { VnNotificationOptions } from '../types/basic';
-
-type NotificationId = string;
-
-interface VnNotificationOptionsWithID extends VnNotificationOptions {
-  id: NotificationId;
-}
-
-// simple, efficient and cheap id store
-const vnID = ref(8);
-
-// generate new id on demand
-function genId(): NotificationId {
-  vnID.value += 3;
-  return `vn-notif-${vnID.value}`;
-}
-
-// main notifications queue
-const mainQ = ref<VnNotificationOptionsWithID[]>([]);
-// temp notifications queue
-const tempQ = ref<VnNotificationOptionsWithID[]>([]);
-// is main notification queue busy/idle
-const isBusy = ref<boolean>(false);
-
-/**
- * removes the last item from the notifications array
- * @returns whether the array is empty or not
- */
-function __removeLast(): boolean {
-  const done = mainQ.value.shift();
-  return done === undefined;
-}
-
-/**
- *
- * @param notif notification object
- * @returns true/false whether the process is done
- */
-function __pushNext(notif: VnNotificationOptionsWithID | undefined): boolean {
-  if (notif === undefined) {
-    return true;
-  }
-
-  mainQ.value.push(notif);
-  return false;
-}
-
-/**
- * adds the temp queue back to main queue
- */
-function _mergeToMain(): void {
-  isBusy.value = false;
-
-  const c = tempQ.value;
-
-  // recursively (and smoothly) add each item to the main queue
-  // every 160ms
-  setTimeout(function addNext() {
-    const done = __pushNext(c.shift());
-
-    if (!done) {
-      setTimeout(addNext, 160);
-    } else {
-      tempQ.value = [];
-    }
-  }, 0);
-}
+import type { VnNotificationOptions, NotificationId } from '@/types';
+import { genId, isBusy, mainQ, tempQ } from './store';
+import { removeLast, mergeToMain } from './helpers';
 
 /**
  * remove all notifications
@@ -74,12 +9,12 @@ function destroy(): void {
   // recursively (and smoothly) remove the last item every 160ms
   setTimeout(function popNext() {
     isBusy.value = true;
-    const done = __removeLast();
+    const done = removeLast();
 
     if (!done) {
       setTimeout(popNext, 160);
     } else {
-      _mergeToMain();
+      mergeToMain();
     }
   }, 0);
 }
@@ -110,15 +45,13 @@ function remove(id: NotificationId): void {
   }
 }
 
-const notifications = mainQ;
-
 function useNotifications() {
   return {
-    notifications,
+    notifications: mainQ,
     remove,
     add,
     destroy,
   };
 }
 
-export { notifications, useNotifications };
+export { useNotifications };

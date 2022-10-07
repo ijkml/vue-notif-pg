@@ -14,11 +14,11 @@ import {
   useTimer,
 } from '@/composables/timer';
 
-import { isValidTimeout } from '@/composables/helpers';
+import { isValidTimeout } from '@/composables/checkers';
 
 import { toRefs, computed, ref, onBeforeUnmount, onMounted } from 'vue';
 
-import type { VnNotificationOptions as Props } from '@/types/basic';
+import type { VnNotificationOptions as Props } from '@/types';
 import VnIcon from './VnIcon.vue';
 
 const props = withDefaults(defineProps<Props>(), {
@@ -156,7 +156,8 @@ onBeforeUnmount(() => {
 <style scoped lang="less">
 .notification-container {
   @apply transition z-50 w-full relative overflow-hidden
-    pointer-events-auto shadow-lg rounded-lg ring-1;
+    pointer-events-auto shadow-lg rounded-lg ring-1
+      duration-300;
 }
 
 .alert-icon {

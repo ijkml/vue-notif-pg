@@ -1,4 +1,4 @@
-import { isValidTimeout } from './helpers';
+import { isValidTimeout } from './checkers';
 
 const notZero = (num: any): num is number => {
   return isValidTimeout(num) && num > 0;
