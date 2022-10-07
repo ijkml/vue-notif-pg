@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue';
 import TheWelcome from './components/TheWelcome.vue';
+import VnRoot from './components/VnRoot.vue';
 </script>
 
 <template>
@@ -14,13 +15,15 @@ import TheWelcome from './components/TheWelcome.vue';
     />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <HelloWorld msg="Let's build!" />
     </div>
   </header>
 
   <main>
     <TheWelcome />
   </main>
+
+  <VnRoot />
 </template>
 
 <style scoped>
