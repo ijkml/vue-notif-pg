@@ -1,19 +1,28 @@
 <script setup lang="ts">
 import { useNotifications } from '@/composables/notifications';
-
+import { ref } from 'vue';
 defineProps<{
   msg: string;
 }>();
 
 const { add, destroy } = useNotifications();
+const n = ref(8);
+
+function id() {
+  n.value += 3;
+  return n.value;
+}
+
+const dummy =
+  'So the LORD God said, It is not good. So the LORD God said, It is not good.';
 
 function sendNotif() {
   add({
-    title: 'Test 101',
+    title: `Test ${id()}`,
     type: 'success',
-    description: 'This is not a drill',
+    description: n.value % 2 === 0 ? dummy : dummy + dummy,
     dark: true,
-    // timeout: 30_000,
+    // timeout: 10_000,
   });
 }
 </script>
