@@ -24,3 +24,7 @@ export interface VnNotificationOptions {
 export interface VnNotificationOptionsWithID extends VnNotificationOptions {
   id: NotificationId;
 }
+
+export interface VnNotificationProps extends VnNotificationOptionsWithID {
+  stacked: boolean;
+}

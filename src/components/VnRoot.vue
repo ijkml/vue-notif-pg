@@ -1,12 +1,9 @@
 <script lang="ts" setup>
 import { useNotifications } from '@/composables/notifications';
+// import { ref, watch } from 'vue';
 import VnItem from './VnItem.vue';
 
 const { notifications, remove } = useNotifications();
-
-// const notifications = computed(() => {
-//   return allNotifications.value.slice().reverse();
-// });
 
 function close(id: string) {
   const elem = document.getElementById(id);
@@ -21,12 +18,17 @@ function close(id: string) {
   <div class="notif-cont">
     <div>
       <TransitionGroup tag="div" name="vn-slide-fade-13">
-        <VnItem
+        <div
           v-for="notif of notifications"
           :key="notif.id"
-          v-bind="notif"
-          @close="close(notif.id)"
-        />
+          class="notif-cont-child"
+        >
+          <VnItem
+            v-bind.prop="notif"
+            :stacked="true"
+            @close="close(notif.id)"
+          />
+        </div>
       </TransitionGroup>
     </div>
   </div>
@@ -38,13 +40,13 @@ function close(id: string) {
     justify-end w-full z-50 sm:w-96;
 
   > div {
-    @apply px-4 py-6 overflow-y-auto
+    @apply px-4 py-6 overflow-y-auto relative
       sm:px-6 lg:px-8 transition overflow-hidden;
-
-    > div {
-      @apply space-y-3;
-    }
   }
+}
+
+.notif-cont-child {
+  @apply gap-y-3 p-2px;
 }
 </style>
 <style lang="less">
@@ -61,6 +63,13 @@ function close(id: string) {
   &-leave-to {
     transform: translateY(36px);
     opacity: 0;
+  }
+}
+
+@keyframes snackbar-hide {
+  to {
+    opacity: 0;
+    transform: translateY(100%);
   }
 }
 </style>

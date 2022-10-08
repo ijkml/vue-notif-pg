@@ -1,4 +1,9 @@
 <script setup lang="ts">
+import { toRefs, computed, ref, onBeforeUnmount, onMounted, watch } from 'vue';
+import VnIcon from './VnIcon.vue';
+import type { VnNotificationProps as Props } from '@/types';
+import { isValidTimeout } from '@/composables/checkers';
+import { stack, getLast } from '@/composables/helpers';
 import {
   alertClose,
   alertError,
@@ -6,7 +11,6 @@ import {
   alertSuccess,
   alertWarning,
 } from '@/assets/icons';
-
 import {
   type UseTickerReturnType,
   type UseTimerReturnType,
@@ -14,25 +18,26 @@ import {
   useTimer,
 } from '@/composables/timer';
 
-import { isValidTimeout } from '@/composables/checkers';
-
-import { toRefs, computed, ref, onBeforeUnmount, onMounted } from 'vue';
-
-import type { VnNotificationOptions as Props } from '@/types';
-import VnIcon from './VnIcon.vue';
-
 const props = withDefaults(defineProps<Props>(), {
   type: 'info',
   timeout: 0,
   dark: false,
   callback: () => {},
+  stacked: false,
 });
 
 const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
-const { timeout: userTimeout, type, callback, dark: isDark } = toRefs(props);
+const {
+  id,
+  timeout: userTimeout,
+  type,
+  callback,
+  dark: isDark,
+  stacked,
+} = toRefs(props);
 
 const timer = ref<UseTimerReturnType | null>(null);
 const ticker = ref<UseTickerReturnType | null>(null);
@@ -89,6 +94,16 @@ function onMouseout() {
   }
 }
 
+function fnStack() {
+  const isFace = getLast()?.id === id.value;
+
+  if (isFace) {
+    // console.log('Face: ', id.value);
+  }
+}
+
+// watch(stacked, fnStack, { immediate: true });
+
 onMounted(() => {
   timer.value = useTimer(() => {
     timeout.value && close();
@@ -96,6 +111,9 @@ onMounted(() => {
   ticker.value = useTicker(() => {
     remainingTime.value -= 10;
   }, 10);
+
+  stack();
+  fnStack();
 });
 
 onBeforeUnmount(() => {
@@ -114,6 +132,7 @@ onBeforeUnmount(() => {
         ? 'ring-skye-dark bg-skye-darkest'
         : 'ring-gray-200 dark:ring-skye-dark bg-white dark:bg-skye-darkest'
     "
+    :id="id"
     @mouseover="onMouseover"
     @mouseout="onMouseout"
   >
@@ -158,6 +177,8 @@ onBeforeUnmount(() => {
   @apply transition z-50 w-full relative overflow-hidden
     pointer-events-auto shadow-lg rounded-lg ring-1
       duration-300;
+
+  max-height: inherit;
 }
 
 .alert-icon {

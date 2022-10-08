@@ -1,5 +1,5 @@
 import type { VnNotificationOptionsWithID } from '@/types';
-import { mainQ, tempQ, isBusy } from './store';
+import { mainQ, tempQ, isBusy, maxStack } from './store';
 
 /**
  * removes the last item from the notifications array
@@ -45,4 +45,65 @@ function mergeToMain(): void {
   }, 0);
 }
 
-export { removeLast, mergeToMain };
+function adjustSingle(elem: HTMLElement) {
+  const len = mainQ.value.length - 1;
+  const { id: faceId } = mainQ.value[len];
+  const face = document.getElementById(faceId)?.parentElement;
+
+  if (!(face && elem && len >= 0)) {
+    return;
+  }
+
+  // reset stylings
+  face.style.height = '';
+  face.style.maxHeight = '';
+
+  const deckHeight = face.offsetHeight ? `${face.offsetHeight}px` : '';
+  elem.style.height = deckHeight;
+  elem.style.maxHeight = deckHeight;
+}
+
+function adjustDeck() {
+  mainQ.value.forEach(({ id }) => {
+    const elem = document.getElementById(id)?.parentElement;
+    if (elem) {
+      adjustSingle(elem);
+    }
+  });
+}
+
+function stack(): void {
+  const len = mainQ.value.length - 1;
+
+  mainQ.value.forEach(({ id }, i) => {
+    const elem = document.getElementById(id)?.parentElement;
+
+    if (elem) {
+      elem.style.transform = `translate3d(0, ${85 * (len - i)}%, -${
+        len - i
+      }px) scale(${1 - 0.05 * (len - i)})`;
+
+      adjustSingle(elem);
+      const hidden = len - i >= maxStack;
+      toggleVisibility(elem, hidden);
+    }
+  });
+}
+
+function toggleVisibility(el: HTMLElement, hidden: boolean) {
+  if (hidden) {
+    window.setTimeout(() => {
+      el.style.visibility = 'hidden';
+    }, 300);
+    el.style.opacity = '0';
+  } else {
+    el.style.opacity = '1';
+    el.style.visibility = 'visible';
+  }
+}
+
+function getLast(): VnNotificationOptionsWithID | undefined {
+  return mainQ.value[mainQ.value.length - 1];
+}
+
+export { removeLast, mergeToMain, stack, getLast, adjustDeck };

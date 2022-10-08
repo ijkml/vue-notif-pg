@@ -1,6 +1,7 @@
 import type { VnNotificationOptions, NotificationId } from '@/types';
 import { genId, isBusy, mainQ, tempQ } from './store';
-import { removeLast, mergeToMain } from './helpers';
+import { removeLast, mergeToMain, stack, adjustDeck } from './helpers';
+import { watch } from 'vue';
 
 /**
  * remove all notifications
@@ -40,10 +41,21 @@ function add(notification: VnNotificationOptions): NotificationId {
  * @param id notification id
  */
 function remove(id: NotificationId): void {
-  if (id) {
-    mainQ.value = mainQ.value.filter((m) => m.id !== id);
+  const index = mainQ.value.findIndex(({ id: $id }) => id === $id);
+  if (index !== undefined) {
+    mainQ.value.splice(index, 1);
+    // stack();
+    mainQ.value.length > 0 && adjustDeck();
   }
 }
+
+watch(
+  () => mainQ.value.length,
+  (nv, ov) => {
+    ov > nv && stack();
+  },
+  { deep: true }
+);
 
 function useNotifications() {
   return {
