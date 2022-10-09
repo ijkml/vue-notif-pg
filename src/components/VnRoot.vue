@@ -4,29 +4,21 @@ import { useNotifications } from '@/composables/notifications';
 import VnItem from './VnItem.vue';
 
 const { notifications, remove } = useNotifications();
-
-function close(id: string) {
-  const elem = document.getElementById(id);
-  if (elem) {
-    elem.style.visibility = 'hidden';
-  }
-  remove(id);
-}
 </script>
 
 <template>
   <div class="notif-cont">
     <div>
-      <TransitionGroup tag="div" name="vn-slide-fade-13">
+      <TransitionGroup appear name="vn-slide-fade-13">
         <div
+          class="notif-cont-ch"
           v-for="notif of notifications"
           :key="notif.id"
-          class="notif-cont-child"
         >
           <VnItem
             v-bind.prop="notif"
             :stacked="true"
-            @close="close(notif.id)"
+            @close="remove(notif.id)"
           />
         </div>
       </TransitionGroup>
@@ -40,36 +32,46 @@ function close(id: string) {
     justify-end w-full z-50 sm:w-96;
 
   > div {
-    @apply px-4 py-6 overflow-y-auto relative
-      sm:px-6 lg:px-8 transition overflow-hidden;
-  }
-}
+    @apply px-4 py-6 overflow-y-auto
+      sm:px-6 lg:px-8 overflow-hidden;
 
-.notif-cont-child {
-  @apply gap-y-3 p-2px;
+    > div {
+      @apply gap-y-3 p-2px;
+    }
+  }
 }
 </style>
 <style lang="less">
-.vn-slide-fade-13 {
-  &-enter-active {
-    transition: all 300ms ease-out;
-  }
-
-  &leave-active {
-    transition: all 450ms cubic-bezier(1, 0.5, 0.8, 1);
-  }
-
-  &-enter-from,
-  &-leave-to {
-    transform: translateY(36px);
-    opacity: 0;
-  }
-}
-
 @keyframes snackbar-hide {
   to {
     opacity: 0;
-    transform: translateY(100%);
+    transform: translate(100%, 50%);
+  }
+}
+
+@keyframes snackbar-show {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+.notif-cont-ch[aria-hidden='false'] {
+  animation: snackbar-show 300ms ease 1;
+}
+
+.notif-cont-ch[aria-hidden='true'] {
+  animation: snackbar-hide 300ms ease forwards 1;
+}
+
+.vn-slide-fade-13 {
+  &-enter-active {
+    animation: snackbar-show 300ms ease 1;
+  }
+  &-leave-active {
+    animation: snackbar-hide 300ms ease forwards 1;
+    position: absolute;
+    bottom: 0;
   }
 }
 </style>

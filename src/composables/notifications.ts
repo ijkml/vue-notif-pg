@@ -1,15 +1,27 @@
 import type { VnNotificationOptions, NotificationId } from '@/types';
-import { genId, isBusy, mainQ, tempQ } from './store';
-import { removeLast, mergeToMain, stack, adjustDeck } from './helpers';
-import { watch } from 'vue';
+import { genId, isBusy, mainQ, maxStack, tempQ } from './store';
+import {
+  removeLast,
+  mergeToMain,
+  removeOne,
+  getAnimationEvent,
+} from './helpers';
 
 /**
  * remove all notifications
  */
 function destroy(): void {
-  // recursively (and smoothly) remove the last item every 160ms
+  // recursively (and smoothly) remove the first item
+  // of the array every 160ms
   setTimeout(function popNext() {
     isBusy.value = true;
+
+    // when destroying, first remove all hidden
+    // instances, prevent them from wasting time
+    while (mainQ.value.length > maxStack) {
+      mainQ.value.shift();
+    }
+
     const done = removeLast();
 
     if (!done) {
@@ -40,22 +52,29 @@ function add(notification: VnNotificationOptions): NotificationId {
  * remove notification with `id`
  * @param id notification id
  */
-function remove(id: NotificationId): void {
+async function remove(id: NotificationId): Promise<void> {
   const index = mainQ.value.findIndex(({ id: $id }) => id === $id);
-  if (index !== undefined) {
-    mainQ.value.splice(index, 1);
-    // stack();
-    mainQ.value.length > 0 && adjustDeck();
+  if (index === undefined) {
+    return;
   }
-}
 
-watch(
-  () => mainQ.value.length,
-  (nv, ov) => {
-    ov > nv && stack();
-  },
-  { deep: true }
-);
+  const el = document.getElementById(id);
+  if (!el) {
+    removeOne(index);
+    return;
+  }
+
+  const eventName = getAnimationEvent(el);
+
+  await new Promise((resolve) => {
+    if (eventName) {
+      el.addEventListener(eventName, () => resolve(0));
+    }
+    resolve(0);
+  }).then(() => {
+    removeOne(index);
+  });
+}
 
 function useNotifications() {
   return {

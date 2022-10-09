@@ -45,7 +45,7 @@ function mergeToMain(): void {
   }, 0);
 }
 
-function adjustSingle(elem: HTMLElement) {
+function adjustDeck(elem: HTMLElement) {
   const len = mainQ.value.length - 1;
   const { id: faceId } = mainQ.value[len];
   const face = document.getElementById(faceId)?.parentElement;
@@ -54,26 +54,21 @@ function adjustSingle(elem: HTMLElement) {
     return;
   }
 
-  // reset stylings
+  // reset forced height
   face.style.height = '';
   face.style.maxHeight = '';
-
+  // set height
   const deckHeight = face.offsetHeight ? `${face.offsetHeight}px` : '';
   elem.style.height = deckHeight;
   elem.style.maxHeight = deckHeight;
 }
 
-function adjustDeck() {
-  mainQ.value.forEach(({ id }) => {
-    const elem = document.getElementById(id)?.parentElement;
-    if (elem) {
-      adjustSingle(elem);
-    }
-  });
-}
-
 function stack(): void {
   const len = mainQ.value.length - 1;
+
+  if (len < 0) {
+    return;
+  }
 
   mainQ.value.forEach(({ id }, i) => {
     const elem = document.getElementById(id)?.parentElement;
@@ -82,10 +77,10 @@ function stack(): void {
       elem.style.transform = `translate3d(0, ${85 * (len - i)}%, -${
         len - i
       }px) scale(${1 - 0.05 * (len - i)})`;
-
-      adjustSingle(elem);
+      adjustDeck(elem);
       const hidden = len - i >= maxStack;
       toggleVisibility(elem, hidden);
+      // el.setAttribute('aria-hidden', 'true');
     }
   });
 }
@@ -106,4 +101,32 @@ function getLast(): VnNotificationOptionsWithID | undefined {
   return mainQ.value[mainQ.value.length - 1];
 }
 
-export { removeLast, mergeToMain, stack, getLast, adjustDeck };
+function getAnimationEvent(el: HTMLElement): string | undefined {
+  const animations: { [k: string]: string } = {
+    animation: 'animationend',
+    OAnimation: 'oAnimationEnd',
+    MozAnimation: 'Animationend',
+    WebkitAnimation: 'webkitAnimationEnd',
+  };
+
+  for (const key of Object.keys(animations)) {
+    if (el.style[key as any] !== undefined) {
+      return animations[key];
+    }
+  }
+  return;
+}
+
+function removeOne(index: number): void {
+  mainQ.value.splice(index, 1);
+  stack();
+}
+
+export {
+  removeLast,
+  mergeToMain,
+  stack,
+  getLast,
+  removeOne,
+  getAnimationEvent,
+};

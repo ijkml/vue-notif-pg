@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRefs, computed, ref, onBeforeUnmount, onMounted, watch } from 'vue';
+import { toRefs, computed, ref, onBeforeUnmount, onMounted } from 'vue';
 import VnIcon from './VnIcon.vue';
 import type { VnNotificationProps as Props } from '@/types';
 import { isValidTimeout } from '@/composables/checkers';
