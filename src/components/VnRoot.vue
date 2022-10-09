@@ -37,7 +37,7 @@ const { notifications, remove } = useNotifications();
 @keyframes snackbar-hide {
   to {
     opacity: 0;
-    transform: translate(100%, 50%);
+    transform: translateY(100%);
   }
 }
 
