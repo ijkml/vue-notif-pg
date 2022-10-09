@@ -10,11 +10,7 @@ const { notifications, remove } = useNotifications();
   <div class="notif-cont">
     <div>
       <TransitionGroup appear name="vn-slide-fade-13">
-        <div
-          class="notif-cont-ch"
-          v-for="notif of notifications"
-          :key="notif.id"
-        >
+        <div v-for="notif of notifications" :key="notif.id">
           <VnItem v-bind.prop="notif" @close="remove(notif.id)" />
         </div>
       </TransitionGroup>
@@ -50,14 +46,6 @@ const { notifications, remove } = useNotifications();
     opacity: 0;
     transform: translate3d(0, 100%, 0);
   }
-}
-
-.notif-cont-ch[aria-hidden='false'] {
-  animation: snackbar-show 300ms ease 1;
-}
-
-.notif-cont-ch[aria-hidden='true'] {
-  animation: snackbar-hide 300ms ease forwards 1;
 }
 
 .vn-slide-fade-13 {
