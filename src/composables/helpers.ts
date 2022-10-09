@@ -33,12 +33,12 @@ function mergeToMain(): void {
   const c = tempQ.value;
 
   // recursively (and smoothly) add each item to the main queue
-  // every 160ms
+  // every 200ms
   setTimeout(function addNext() {
     const done = pushNext(c.shift());
 
     if (!done) {
-      setTimeout(addNext, 160);
+      setTimeout(addNext, 200);
     } else {
       tempQ.value = [];
     }

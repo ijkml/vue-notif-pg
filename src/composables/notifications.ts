@@ -12,7 +12,7 @@ import {
  */
 function destroy(): void {
   // recursively (and smoothly) remove the first item
-  // of the array every 160ms
+  // of the array every 200ms
   setTimeout(function popNext() {
     isBusy.value = true;
 
@@ -25,7 +25,7 @@ function destroy(): void {
     const done = removeLast();
 
     if (!done) {
-      setTimeout(popNext, 160);
+      setTimeout(popNext, 200);
     } else {
       mergeToMain();
     }
