@@ -15,11 +15,7 @@ const { notifications, remove } = useNotifications();
           v-for="notif of notifications"
           :key="notif.id"
         >
-          <VnItem
-            v-bind.prop="notif"
-            :stacked="true"
-            @close="remove(notif.id)"
-          />
+          <VnItem v-bind.prop="notif" @close="remove(notif.id)" />
         </div>
       </TransitionGroup>
     </div>

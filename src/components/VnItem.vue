@@ -3,7 +3,7 @@ import { toRefs, computed, ref, onBeforeUnmount, onMounted } from 'vue';
 import VnIcon from './VnIcon.vue';
 import type { VnNotificationProps as Props } from '@/types';
 import { isValidTimeout } from '@/composables/checkers';
-import { stack, getLast } from '@/composables/helpers';
+import { stack } from '@/composables/helpers';
 import {
   alertClose,
   alertError,
@@ -36,7 +36,6 @@ const {
   type,
   callback,
   dark: isDark,
-  stacked,
 } = toRefs(props);
 
 const timer = ref<UseTimerReturnType | null>(null);
@@ -94,16 +93,6 @@ function onMouseout() {
   }
 }
 
-function fnStack() {
-  const isFace = getLast()?.id === id.value;
-
-  if (isFace) {
-    // console.log('Face: ', id.value);
-  }
-}
-
-// watch(stacked, fnStack, { immediate: true });
-
 onMounted(() => {
   timer.value = useTimer(() => {
     timeout.value && close();
@@ -113,7 +102,6 @@ onMounted(() => {
   }, 10);
 
   stack();
-  fnStack();
 });
 
 onBeforeUnmount(() => {
