@@ -21,12 +21,10 @@ const { notifications, remove } = useNotifications();
 <style lang="less" scoped>
 .notif-cont {
   @apply fixed bottom-0 right-0 flex flex-col
-    justify-end w-full z-50 sm:w-96;
+    justify-end w-full z-50 px-4 py-6
+      sm:(w-96 px-6) lg:(px-8);
 
   > div {
-    @apply px-4 py-6 overflow-y-auto
-      sm:px-6 lg:px-8 overflow-hidden;
-
     > div {
       @apply gap-y-3 p-2px;
     }
